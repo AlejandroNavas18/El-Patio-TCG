@@ -10,30 +10,42 @@ interface GameContextType {
     allCards: Card[];
     hasCard: (id: string) => boolean;
     registrarResultado: (gano: boolean) => void; // Agregada a la interfaz
+    // --- NUEVAS PROPIEDADES PARA EL SISTEMA DE PARTIDAS ---
+    selectedTeam: Card[];
+    selectedCoach: Card | null;
+    toggleCardToTeam: (card: Card) => void;
+    selectCoach: (coach: Card | null) => void;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
 
 export const GameProvider = ({ children }: { children: React.ReactNode }) => {
-  const allCards = data.cartas as unknown as Card[];
+    const allCards = data.cartas as unknown as Card[];
 
-  const [user, setUser] = useState<User>({
-    id: '1',
-    username: 'Jugador 1',
-    password: '',
-    email: 'test@test.com',
-    monedas: 500,
-    stats: { victorias: 5, derrotas: 2, partidasJugadas: 7 },
-    // Lógica de prueba: Filtramos una de cada rareza para el inventario
-    inventario: [
-        allCards.find(c => c.rareza === 'Normal'),
-        allCards.find(c => c.rareza === 'Super Crack'),
-        allCards.find(c => c.rareza === 'Mago'),
-        allCards.find(c => c.rareza === 'Entrenador'),
-        allCards.find(c => c.rareza === 'Balon de Oro'),
-        allCards.find(c => c.rareza === 'Invencible'),
-    ].filter(Boolean) as Card[], // .filter(Boolean) evita errores si alguna rareza no existe en el JSON
-});
+    const [user, setUser] = useState<User>({
+        id: '1',
+        username: 'Jugador 1',
+        password: '',
+        email: 'test@test.com',
+        monedas: 500,
+        stats: { victorias: 5, derrotas: 2, partidasJugadas: 7 },
+        // Lógica de prueba: Filtramos una de cada rareza para el inventario
+        inventario: [
+            allCards.find(c => c.rareza === 'Normal'),
+            allCards.find(c => c.rareza === 'Super Crack'),
+            allCards.find(c => c.rareza === 'Mago'),
+            allCards.find(c => c.rareza === 'Entrenador'),
+            allCards.find(c => c.rareza === 'Balon de Oro'),
+            allCards.find(c => c.rareza === 'Invencible'),
+            // Añadimos 2 cartas adicionales del JSON proporcionado
+            allCards.find(c => c.id === 15), // Julio (Torbellino)
+            allCards.find(c => c.id === 21), // Fuerza SJ (Triple Alianza)
+        ].filter(Boolean) as Card[], // .filter(Boolean) evita errores si alguna rareza no existe en el JSON
+    });
+
+    // --- ESTADOS DE SELECCIÓN ---
+    const [selectedTeam, setSelectedTeam] = useState<Card[]>([]);
+    const [selectedCoach, setSelectedCoach] = useState<Card | null>(null);
 
     // 1. Verificar si tiene la carta
     const hasCard = (id: string) => {
@@ -69,14 +81,47 @@ export const GameProvider = ({ children }: { children: React.ReactNode }) => {
         }));
     };
 
+    // 5. Gestión del equipo (Máximo 7 cartas)
+    const toggleCardToTeam = (card: Card) => {
+        setSelectedTeam(prev => {
+            // Si la carta ya está en el equipo, la eliminamos (deseleccionar)
+            if (prev.find(c => c.id === card.id)) {
+                return prev.filter(c => c.id !== card.id);
+            }
+            // Si intentamos añadir más de 7, bloqueamos la acción
+            if (prev.length >= 7) return prev;
+            // Evitamos que se añadan entrenadores al equipo de jugadores
+            if (card.rareza === 'Entrenador') return prev;
+
+            return [...prev, card];
+        });
+    };
+
+    // 6. Selección de Entrenador (Solo 1 y debe ser tipo Entrenador)
+    const selectCoach = (coach: Card | null) => {
+        if (!coach) {
+            setSelectedCoach(null);
+            return;
+        }
+        // Solo permitimos cartas que tengan la rareza específica de Entrenador
+        if (coach.rareza === 'Entrenador') {
+            setSelectedCoach(coach);
+        }
+    };
+
     return (
-        <GameContext.Provider value={{ 
-            user, 
-            agregarCarta, 
-            gastarMonedas, 
-            allCards, 
-            hasCard, 
-            registrarResultado 
+        <GameContext.Provider value={{
+            user,
+            agregarCarta,
+            gastarMonedas,
+            allCards,
+            hasCard,
+            registrarResultado,
+            // Exportación de nuevas funciones y estados
+            selectedTeam,
+            selectedCoach,
+            toggleCardToTeam,
+            selectCoach
         }}>
             {children}
         </GameContext.Provider>
