@@ -21,7 +21,13 @@ const GameContext = createContext<GameContextType | undefined>(undefined);
 
 export const GameProvider = ({ children }: { children: React.ReactNode }) => {
     const allCards = data.cartas as unknown as Card[];
+// Dentro de GameProvider en GameContext.tsx
 
+const addCoins = (cantidad: number) => {
+    setUser(prev => ({ ...prev, monedas: prev.monedas + cantidad }));
+};
+
+// No olvides añadirla al "value" del Provider y a la interfaz GameContextType
     const [user, setUser] = useState<User>({
         id: '1',
         username: 'Jugador 1',
