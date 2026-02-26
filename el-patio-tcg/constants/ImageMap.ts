@@ -39,4 +39,6 @@ export const CARD_IMAGES: { [key: number]: any } = {
     38: require('../assets/images/cards/josema.png'),
     39: require('../assets/images/cards/pablo.png'),
     40: require('../assets/images/cards/julio.png'),
+    
   };
+  export const SOBRE_IMAGE = require('../assets/images/sobre.png');

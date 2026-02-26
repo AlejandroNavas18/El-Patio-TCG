@@ -72,9 +72,15 @@ const ShinyCard = ({ item, isOwned, count, cardWidth, cardHeight }: any) => {
         </View>
 
         {!isOwned && (
-          <View style={styles.lockOverlay}>
-            <Ionicons name="lock-closed" size={cardWidth * 0.25} color="rgba(255,255,255,0.3)" />
-          </View>
+          <>
+            <View style={styles.lockOverlay}>
+              <Ionicons name="lock-closed" size={cardWidth * 0.25} color="rgba(255,255,255,0.3)" />
+            </View>
+            {/* Icono adicional para cartas que no tienes */}
+            <View style={styles.missingIconOverlay}>
+              <Ionicons name="add-circle-outline" size={cardWidth * 0.2} color="rgba(255,255,255,0.7)" />
+            </View>
+          </>
         )}
 
         {isOwned && count > 1 && (
@@ -224,6 +230,13 @@ const styles = StyleSheet.create({
   },
 
   lockOverlay: { ...StyleSheet.absoluteFillObject, justifyContent: 'center', alignItems: 'center' },
+  missingIconOverlay: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   idBadge: { position: 'absolute', top: 0, left: 0, backgroundColor: 'rgba(0,0,0,0.5)', paddingHorizontal: 4, borderRadius: 4 },
   cardId: { color: '#fff', fontSize: 8, fontWeight: 'bold' },
   badgeCount: { position: 'absolute', bottom: 0, right: 0, backgroundColor: '#ef4444', minWidth: 22, height: 22, borderRadius: 11, justifyContent: 'center', alignItems: 'center', borderWidth: 1.5, borderColor: '#fff' },

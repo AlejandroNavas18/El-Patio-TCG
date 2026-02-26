@@ -20,14 +20,15 @@ interface GameContextType {
 const GameContext = createContext<GameContextType | undefined>(undefined);
 
 export const GameProvider = ({ children }: { children: React.ReactNode }) => {
-    const allCards = data.cartas as unknown as Card[];
-// Dentro de GameProvider en GameContext.tsx
+    const allCards = (data.cartas as any[]).map(c => ({ ...c, id: String(c.id) })) as Card[];
 
-const addCoins = (cantidad: number) => {
-    setUser(prev => ({ ...prev, monedas: prev.monedas + cantidad }));
-};
+    // Dentro de GameProvider en GameContext.tsx
 
-// No olvides añadirla al "value" del Provider y a la interfaz GameContextType
+    const addCoins = (cantidad: number) => {
+        setUser(prev => ({ ...prev, monedas: prev.monedas + cantidad }));
+    };
+
+    // No olvides añadirla al "value" del Provider y a la interfaz GameContextType
     const [user, setUser] = useState<User>({
         id: '1',
         username: 'Jugador 1',
@@ -43,9 +44,8 @@ const addCoins = (cantidad: number) => {
             allCards.find(c => c.rareza === 'Entrenador'),
             allCards.find(c => c.rareza === 'Balon de Oro'),
             allCards.find(c => c.rareza === 'Invencible'),
-            // Añadimos 2 cartas adicionales del JSON proporcionado
-            allCards.find(c => c.id === 15), // Julio (Torbellino)
-            allCards.find(c => c.id === 21), // Fuerza SJ (Triple Alianza)
+            allCards.find(c => c.id === '15'),  // ← string ahora
+            allCards.find(c => c.id === '21'),  // ← string ahora
         ].filter(Boolean) as Card[], // .filter(Boolean) evita errores si alguna rareza no existe en el JSON
     });
 
